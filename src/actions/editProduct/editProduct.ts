@@ -6,7 +6,7 @@ export const editProduct = async (
   userId: number | undefined
 ) => {
   try {
-    const response = await client.put(`/posts${id}`, {
+    const response = await client.put(`/posts/${id}`, {
       title,
       userId,
     });

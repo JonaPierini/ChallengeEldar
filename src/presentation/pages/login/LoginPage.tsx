@@ -9,14 +9,15 @@ interface FormInterface {
   password: string;
 }
 
+//userRol => username: emilys, password: emilyspass
+//adminRol => "username": "michaelw", "password": "michaelwpass",
+
 export const LoginPage = () => {
   const [formState, setFormState] = useState<FormInterface>({
     username: "",
     password: "",
   });
   const { login } = useAuthStore();
-  // username: 'emilys',
-  // password: 'emilyspass',
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.name === "username") {
@@ -27,6 +28,10 @@ export const LoginPage = () => {
   };
 
   const handleLogin = async () => {
+    if (formState.username.length === 0 || formState.password.length === 0) {
+      return;
+    }
+    if (formState.password.length < 4) return;
     const wasSuccessful = await login(formState.username, formState.password);
     if (!wasSuccessful) {
       Swal.fire({

@@ -24,7 +24,7 @@ export const useAuthStore = create<AuthState>()(
           set({ status: false, token: undefined, user: undefined });
           return false;
         }
-        set({ status: true, token: resp.accessToken, user: resp.firstName });
+        set({ status: true, token: resp.accessToken, user: resp.username });
         return true;
       },
 

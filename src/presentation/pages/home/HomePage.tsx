@@ -1,59 +1,45 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { getProduct } from "../../../actions/getProduct/getProduct";
 import { useAuthStore } from "../../../store/auth/useAuthStore";
 import { v4 as uuidv4 } from "uuid";
 import {
   Box,
-  IconButton,
+  Button,
   List,
   ListItem,
   ListItemText,
+  TextField,
   Typography,
 } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
 import "./HomePage.css";
 import { Spinner } from "../../components/ui/Spinner";
 import { addProduct } from "../../../actions/addProduct/addProduct";
+import Swal from "sweetalert2";
+import { editProduct } from "../../../actions/editProduct/editProduct";
 
 export const HomePage = () => {
   const { user } = useAuthStore();
 
-  interface UserList {
+  interface ProductList {
     title: string;
     body?: string;
     userId?: number;
     id: number;
   }
-  const [listUser, setListUser] = useState<UserList[]>([]);
-  const [initialPage, setInitialPage] = useState<number>(0);
-  const [nextPage, setNextPage] = useState<number>(10);
+  const [productList, setListProduct] = useState<ProductList[]>([]);
   const [loading, setLoading] = useState(false);
 
   const getData = async () => {
     setLoading(true);
     const response = await getProduct();
-    setListUser(response?.data);
+    setListProduct(response?.data);
     setLoading(false);
   };
 
   useEffect(() => {
     getData();
   }, []);
-
-  const handleNextPage = () => {
-    if (nextPage === listUser.length) return;
-    setInitialPage(initialPage + 10);
-    setNextPage(nextPage + 10);
-  };
-
-  const handlePrevPage = () => {
-    if (initialPage !== 0 && nextPage > 10) {
-      setInitialPage(initialPage - 10);
-      setNextPage(nextPage - 10);
-    }
-  };
 
   const [addTitle, setAddTitle] = useState("");
 
@@ -72,46 +58,41 @@ export const HomePage = () => {
     );
     const newIdUser = { ...response!.data, id: uuidv4() };
     if (addTitle === "") return;
-    setListUser([newIdUser, ...listUser]);
+    setListProduct([...productList, newIdUser]);
     setAddTitle("");
   };
 
-  //EDIT
-
   const [isEdit, setIsEdit] = useState(false);
-  const [selectedId, setSelectId] = useState<UserList>();
-  const [changeText, setChangeText] = useState<string>();
+  const [selectedId, setSelectId] = useState<ProductList>();
+  const [changeText, setChangeText] = useState<string>("");
 
   const handleEdit = (id: number) => {
-    const data = listUser.find((e) => e.id === id);
+    const data = productList.find((e) => e.id === id);
     if (data && data.id) {
       setSelectId(data);
       setIsEdit((prev) => !prev);
     }
   };
 
-  const handleUpdate = (id: number) => {
-    fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        id: selectedId?.id,
-        title: changeText,
-        userId: selectedId?.userId,
-      }),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-    })
-      .then((response) => response.json())
-      .then((updatedData) => {
-        // Actualiza el usuario en listUser en lugar de agregar uno nuevo
-        const updatedList = listUser.map((user) =>
-          user.id === updatedData.id ? updatedData : user
-        );
-        setListUser(updatedList); // Actualiza la lista de usuarios
-        setIsEdit(false); // Desactivar modo edición
-        setChangeText(""); // Limpiar el input
+  const handleUpdate = async (id: number) => {
+    const updatedData = await editProduct(id, changeText, selectedId?.userId);
+    if (updatedData) {
+      const updatedList = productList.map((product) =>
+        product.id === updatedData.id ? updatedData : product
+      );
+      setListProduct(updatedList);
+      setIsEdit(false);
+      setChangeText("");
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Change didn't save",
+        confirmButtonColor: "#DD6B55",
       });
+      setIsEdit(false);
+      setChangeText("");
+    }
   };
 
   if (loading) {
@@ -130,34 +111,54 @@ export const HomePage = () => {
         Welcome {user}
       </Typography>
       <Grid className="parent">
-        {listUser?.slice(initialPage, nextPage).map((u) => (
-          <>
+        {productList?.map((u) => (
+          <Fragment key={u.id}>
             {isEdit && selectedId?.id === u.id ? (
               <Box>
-                <input onChange={(e) => setChangeText(e.target.value)} />
-                <button onClick={() => handleUpdate(u.id)}>Save</button>
+                <TextField
+                  margin="dense"
+                  value={changeText}
+                  fullWidth
+                  onChange={(e) => setChangeText(e.target.value)}
+                />
+                <Button
+                  fullWidth
+                  variant="contained"
+                  onClick={() => handleUpdate(u.id)}
+                >
+                  Save
+                </Button>
               </Box>
             ) : (
-              <List
-                key={uuidv4()}
-                style={{ border: "2px solid gray", backgroundColor: "tomato" }}
-              >
+              <List key={uuidv4()} style={{ border: "2px solid gray" }}>
                 <ListItem>
                   <ListItemText primary={u.title} secondary={u.id} />
-                  <button onClick={() => handleEdit(u.id)}>Editar</button>
+                  <Button
+                    disabled={user === "emilys"}
+                    onClick={() => handleEdit(u.id)}
+                  >
+                    Editar
+                  </Button>
                 </ListItem>
               </List>
             )}
-          </>
+          </Fragment>
         ))}
       </Grid>
-      <Box>
-        <input
+      <Box display={"flex"} justifyContent={"center"} margin={2}>
+        <TextField
+          disabled={user === "emilys"}
           placeholder="agregar"
           value={addTitle}
           onChange={(e) => setAddTitle(e.target.value)}
         />
-        <button onClick={handleAdd}>Agregar</button>
+        <Button
+          disabled={user === "emilys"}
+          variant="contained"
+          onClick={handleAdd}
+        >
+          Agregar
+        </Button>
       </Box>
     </Grid>
   );
