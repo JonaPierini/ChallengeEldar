@@ -9,9 +9,6 @@ interface FormInterface {
   password: string;
 }
 
-//userRol => username: emilys, password: emilyspass
-//adminRol => "username": "michaelw", "password": "michaelwpass",
-
 export const LoginPage = () => {
   const [formState, setFormState] = useState<FormInterface>({
     username: "",

@@ -1,50 +1,23 @@
-# React + TypeScript + Vite
+## Steps
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# 1 - git clone
 
-Currently, two official plugins are available:
+# 2 - move the root proyect (eldar)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# 3 - npm i
 
-## Expanding the ESLint configuration
+# 4 - create .env and put this credential =>
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+# VITE_API_URL_LOGIN=https://dummyjson.com/auth
 
-- Configure the top-level `parserOptions` property like this:
+# VITE_API_URL_JSON_PLACEHOLDER=https://jsonplaceholder.typicode.com
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+# npm run dev
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+# Para el proyecto use dos endpoint una para el login y otro para simular los datos a consumir. El del login me parecio interesante debido a que al enviarle determinadas credenciales te devuelve informacion muy similar a una api. Los roles no estan definidos porque es una api ya construida pero mas alla de eso simule que el =>
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+# userRol => username: emilys, password: emilyspass
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+# adminRol => "username": "michaelw", "password": "michaelwpass",
+
+# Tuve como inconveniente que al crear un nuevo producto y luego querer editar ese producto me tira un error. Esta controlado pero no solucionado. Las demas ediciones (que no son los nuevos creados ) funcionan bien.
