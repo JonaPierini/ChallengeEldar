@@ -2,8 +2,8 @@ import { client } from "../../config/api/cliente";
 
 export const editProduct = async (
   id: number,
-  title: string,
-  userId: number
+  title: string | undefined,
+  userId: number | undefined
 ) => {
   try {
     const response = await client.put(`/posts${id}`, {

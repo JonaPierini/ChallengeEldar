@@ -71,8 +71,47 @@ export const HomePage = () => {
       newProd.id + 1
     );
     const newIdUser = { ...response!.data, id: uuidv4() };
+    if (addTitle === "") return;
     setListUser([newIdUser, ...listUser]);
     setAddTitle("");
+  };
+
+  //EDIT
+
+  const [isEdit, setIsEdit] = useState(false);
+  const [selectedId, setSelectId] = useState<UserList>();
+  const [changeText, setChangeText] = useState<string>();
+
+  const handleEdit = (id: number) => {
+    const data = listUser.find((e) => e.id === id);
+    if (data && data.id) {
+      setSelectId(data);
+      setIsEdit((prev) => !prev);
+    }
+  };
+
+  const handleUpdate = (id: number) => {
+    fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        id: selectedId?.id,
+        title: changeText,
+        userId: selectedId?.userId,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => response.json())
+      .then((updatedData) => {
+        // Actualiza el usuario en listUser en lugar de agregar uno nuevo
+        const updatedList = listUser.map((user) =>
+          user.id === updatedData.id ? updatedData : user
+        );
+        setListUser(updatedList); // Actualiza la lista de usuarios
+        setIsEdit(false); // Desactivar modo edición
+        setChangeText(""); // Limpiar el input
+      });
   };
 
   if (loading) {
@@ -92,12 +131,24 @@ export const HomePage = () => {
       </Typography>
       <Grid className="parent">
         {listUser?.slice(initialPage, nextPage).map((u) => (
-          <List key={uuidv4()} style={{ border: "2px solid gray" }}>
-            <ListItem>
-              <ListItemText primary={u.title} secondary={u.id} />
-              <button>Editar</button>
-            </ListItem>
-          </List>
+          <>
+            {isEdit && selectedId?.id === u.id ? (
+              <Box>
+                <input onChange={(e) => setChangeText(e.target.value)} />
+                <button onClick={() => handleUpdate(u.id)}>Save</button>
+              </Box>
+            ) : (
+              <List
+                key={uuidv4()}
+                style={{ border: "2px solid gray", backgroundColor: "tomato" }}
+              >
+                <ListItem>
+                  <ListItemText primary={u.title} secondary={u.id} />
+                  <button onClick={() => handleEdit(u.id)}>Editar</button>
+                </ListItem>
+              </List>
+            )}
+          </>
         ))}
       </Grid>
       <Box>
