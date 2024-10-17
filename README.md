@@ -1,8 +1,8 @@
 ## Steps
 
-# 1 - git clone
+# 1 - git clone this proyect
 
-# 2 - move the root proyect (eldar)
+# 2 - move the root directory proyect
 
 # 3 - npm i
 
@@ -19,5 +19,7 @@
 # userRol => username: emilys, password: emilyspass
 
 # adminRol => "username": "michaelw", "password": "michaelwpass",
+
+# Los datos de inicio de sesión se mantienen guardados en el localstorage por lo cual es necesario cerrar sesion para poder iniciarla con otro usuarios
 
 # Tuve como inconveniente que al crear un nuevo producto y luego querer editar ese producto me tira un error. Esta controlado pero no solucionado. Las demas ediciones (que no son los nuevos creados ) funcionan bien.
