@@ -1,22 +1,15 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getProduct } from "../../../actions/getProduct/getProduct";
 import { useAuthStore } from "../../../store/auth/useAuthStore";
 import { v4 as uuidv4 } from "uuid";
-import {
-  Box,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import "./HomePage.css";
 import { Spinner } from "../../components/ui/Spinner";
 import { addProduct } from "../../../actions/addProduct/addProduct";
 import Swal from "sweetalert2";
 import { editProduct } from "../../../actions/editProduct/editProduct";
+import { ProductItem } from "../../components/ui/ProductItem";
 
 export const HomePage = () => {
   const { user } = useAuthStore();
@@ -29,6 +22,10 @@ export const HomePage = () => {
   }
   const [productList, setListProduct] = useState<ProductList[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [addTitle, setAddTitle] = useState("");
+  const [selectedId, setSelectId] = useState<ProductList>();
+  const [changeText, setChangeText] = useState<string>("");
 
   const getData = async () => {
     setLoading(true);
@@ -40,8 +37,6 @@ export const HomePage = () => {
   useEffect(() => {
     getData();
   }, []);
-
-  const [addTitle, setAddTitle] = useState("");
 
   const handleAdd = async () => {
     const newProd = {
@@ -61,10 +56,6 @@ export const HomePage = () => {
     setListProduct([...productList, newIdUser]);
     setAddTitle("");
   };
-
-  const [isEdit, setIsEdit] = useState(false);
-  const [selectedId, setSelectId] = useState<ProductList>();
-  const [changeText, setChangeText] = useState<string>("");
 
   const handleEdit = (id: number) => {
     const data = productList.find((e) => e.id === id);
@@ -111,38 +102,19 @@ export const HomePage = () => {
         Welcome {user}
       </Typography>
       <Grid className="parent">
-        {productList?.map((u) => (
-          <Fragment key={u.id}>
-            {isEdit && selectedId?.id === u.id ? (
-              <Box>
-                <TextField
-                  margin="dense"
-                  value={changeText}
-                  fullWidth
-                  onChange={(e) => setChangeText(e.target.value)}
-                />
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={() => handleUpdate(u.id)}
-                >
-                  Save
-                </Button>
-              </Box>
-            ) : (
-              <List key={uuidv4()} style={{ border: "2px solid gray" }}>
-                <ListItem>
-                  <ListItemText primary={u.title} secondary={u.id} />
-                  <Button
-                    disabled={user === "emilys"}
-                    onClick={() => handleEdit(u.id)}
-                  >
-                    Editar
-                  </Button>
-                </ListItem>
-              </List>
-            )}
-          </Fragment>
+        {productList?.map((prod) => (
+          <ProductItem
+            key={prod.id}
+            prod={prod}
+            isEdit={isEdit}
+            selectedId={selectedId}
+            changeText={changeText}
+            user={user}
+            setChangeText={setChangeText}
+            handleUpdate={handleUpdate}
+            uuidv4={uuidv4}
+            handleEdit={handleEdit}
+          ></ProductItem>
         ))}
       </Grid>
       <Box display={"flex"} justifyContent={"center"} margin={2}>
